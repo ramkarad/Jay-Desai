@@ -1,0 +1,12 @@
+{
+  "name": "taitva-pure-by-nature",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Taitva Pure by Nature - Fresh & Natural Juices",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "echo \"Static HTML/CSS/JS ready\"",
+    "start": "node server.js",
+    "lint": "node --check store-config.js && node --check script.js && node --check admin.js && node --check server.js"
+  }
+}

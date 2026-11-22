@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart &amp; Checkout | Taitva Pure by Nature</title>
+  <meta name="description" content="Review your Taitva Pure by Nature cart and complete your order via UPI or WhatsApp.">
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+  <div class="announcement-bar" id="announcement-bar">
+    <span>Freshly made juices · Order directly on</span>
+    <a href="https://wa.me/919724307705" target="_blank" rel="noopener noreferrer" data-config-whatsapp>WhatsApp</a>
+  </div>
+
+  <header class="header">
+    <a href="/index.html" class="logo">Tai<span>tva</span></a>
+    <button class="menu-btn" type="button" onclick="toggleMenu()" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+    <nav id="navbar" aria-label="Main navigation">
+      <a href="/index.html">Home</a>
+      <a href="/products.html">Products</a>
+      <a href="/about.html">About Us</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/cart.html" class="cart-nav">
+        Cart
+        <span class="cart-count" id="cartCount">0</span>
+      </a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-banner">
+      <span class="eyebrow">Secure Checkout</span>
+      <h1>Your Shopping <span>Cart</span></h1>
+      <p>Review your bottles and place your order via UPI or WhatsApp.</p>
+    </section>
+
+    <section class="section">
+      <div class="cart-layout">
+        <div id="cart-items"></div>
+
+        <aside class="cart-summary" id="cart-summary">
+          <div class="summary-header">
+            <h2>Order Summary</h2>
+            <span class="summary-count tabular-nums" id="summary-item-count">0 items</span>
+          </div>
+
+          <div class="summary-items-list" id="summary-items-list"></div>
+
+          <div class="summary-rows">
+            <div class="summary-line" id="summary-mrp-row">
+              <span>Total MRP</span>
+              <span id="summary-mrp" class="tabular-nums">₹0.00</span>
+            </div>
+
+            <div class="summary-line summary-discount" id="summary-discount-row" hidden>
+              <span>Discount on MRP</span>
+              <span id="summary-discount" class="tabular-nums">−₹0.00</span>
+            </div>
+
+            <div class="summary-line">
+              <span>Delivery</span>
+              <span class="summary-delivery-val">Confirmed on WhatsApp</span>
+            </div>
+
+            <div class="summary-line total">
+              <span>Order Total</span>
+              <strong id="cart-total" class="tabular-nums">₹0.00</strong>
+            </div>
+          </div>
+
+          <div class="summary-savings-banner" id="summary-savings-banner" hidden>
+            You save <strong id="summary-savings-amt" class="tabular-nums">₹0.00</strong> on this order
+          </div>
+
+          <button type="button" class="btn whatsapp-btn summary-cta" onclick="openPayment()">
+            Place Order →
+          </button>
+
+          <p class="summary-payment-note">
+            <span aria-hidden="true">🔒</span> Pay via UPI (GPay, PhonePe, Paytm) or Cash on Delivery (COD)
+          </p>
+
+          <a href="/products.html" class="continue-link">
+            ← Continue Shopping
+          </a>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <div class="payment-overlay" id="payment-overlay" role="dialog" aria-modal="true" aria-labelledby="upi-modal-title">
+    <div class="payment-modal">
+      <button type="button" class="payment-close" aria-label="Close payment modal" onclick="closePayment()">×</button>
+      <div class="payment-heading"><span aria-hidden="true">🍊</span> TAITVA | UPI PAYMENT</div>
+      <h2 id="upi-modal-title">Pay <span id="payment-amount" class="tabular-nums">₹0.00</span> via UPI</h2>
+      <p class="payment-upi">UPI ID: <strong id="upi-display">tusharsanandiya@okicici</strong></p>
+
+      <div class="payment-btn-stack">
+        <button type="button" class="payment-copy" id="copy-upi-btn" onclick="copyUPI()">
+          <span aria-hidden="true">📋</span> Copy UPI ID
+        </button>
+        <a class="payment-open" id="upi-pay-link" href="#" role="button" onclick="return launchUPIPayment(event)">
+          Open UPI App to Pay →
+        </a>
+      </div>
+
+      <div class="payment-step-box">
+        Tap the button to open a UPI app on your phone. Complete the payment, return to this page,
+        <button type="button" class="payment-whatsapp-link" onclick="continueOrder('UPI')">
+          Go to WhatsApp and share your payment screenshot.
+        </button>
+      </div>
+
+      <button type="button" class="payment-cod-box" onclick="continueOrder('COD')">
+        <span aria-hidden="true">🚚</span> Cash on Delivery (COD) is Available! Click to Continue For Order
+      </button>
+
+      <p class="payment-status-banner" id="payment-status" aria-live="polite">
+        Finish paying in your UPI app, then return to Taitva.
+      </p>
+
+      <div class="payment-verify-note">
+        Payment is not verified automatically. We will confirm your payment after checking our UPI account.
+      </div>
+
+      <button type="button" class="payment-continue-pill" onclick="continueOrder('UPI')">
+        Continue for Order →
+      </button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-column">
+        <h3>Explore</h3>
+        <a href="/index.html">Home</a>
+        <a href="/products.html">Shop Products</a>
+        <a href="/about.html">About &amp; FAQ</a>
+        <a href="/contact.html">Contact Us</a>
+        <a href="/cart.html">Shopping Cart</a>
+      </div>
+      <div class="footer-column">
+        <h3>Reach Us</h3>
+        <a href="mailto:zivagoworld@gmail.com" data-config-email>zivagoworld@gmail.com</a>
+        <a href="tel:+919724307705" data-config-phone>+91 97243 07705</a>
+        <a href="https://wa.me/919724307705" target="_blank" rel="noopener noreferrer" data-config-whatsapp>Order on WhatsApp</a>
+        <a href="https://www.instagram.com/zivago.world" target="_blank" rel="noopener noreferrer" data-config-instagram>Instagram (@zivago.world)</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© <span data-config-year>2026</span> <span data-config-brand>Taitva Pure by Nature</span>. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/store-config.js"></script>
+  <script src="/script.js"></script>
+  <script>
+    const DEFAULT_STATUS_TEXT = "Finish paying in your UPI app, then return to Taitva.";
+
+    function getActiveConfigPayment() {
+      const cfg = window.TAITVA_CONFIG || {};
+      return cfg.payment || {
+        upiId: "tusharsanandiya@okicici",
+        payeeName: "Taitva Pure by Nature",
+        upiNote: "Taitva Juice Order"
+      };
+    }
+
+    function getPaymentAmount() {
+      const el = document.getElementById("cart-total");
+      if (!el) return 0;
+      const amount = Number(el.textContent.replace(/[^\d.]/g, ""));
+      return Number.isFinite(amount) ? amount : 0;
+    }
+
+    function buildUPILink(amount, orderRef) {
+      const pay = getActiveConfigPayment();
+      const note = orderRef ? `${pay.upiNote} (${orderRef})` : pay.upiNote;
+      const params = new URLSearchParams({
+        pa: pay.upiId,
+        pn: pay.payeeName,
+        am: Number(amount).toFixed(2),
+        cu: "INR",
+        tn: note
+      });
+      return "upi://pay?" + params.toString();
+    }
+
+    function openPayment(overrideAmount, orderRecord) {
+      const pay = getActiveConfigPayment();
+      const amount = Number.isFinite(Number(overrideAmount)) ? Number(overrideAmount) : getPaymentAmount();
+      if (amount <= 0) return;
+
+      document.getElementById("payment-amount").textContent = "₹" + amount.toFixed(2);
+      document.getElementById("upi-display").textContent = pay.upiId;
+      document.getElementById("payment-status").textContent = DEFAULT_STATUS_TEXT;
+
+      const orderRef = orderRecord ? orderRecord.orderId : "";
+      const payLink = document.getElementById("upi-pay-link");
+      if (payLink) {
+        payLink.dataset.amount = amount.toFixed(2);
+        payLink.dataset.orderRef = orderRef;
+        payLink.href = buildUPILink(amount, orderRef);
+      }
+
+      document.getElementById("payment-overlay").classList.add("show");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closePayment() {
+      document.getElementById("payment-overlay").classList.remove("show");
+      document.body.style.overflow = "";
+    }
+
+    function launchUPIPayment(event) {
+      if (event) event.preventDefault();
+      const pay = getActiveConfigPayment();
+      const payLink = document.getElementById("upi-pay-link");
+      const amount = Number(payLink?.dataset.amount) || getPaymentAmount();
+      const orderRef = payLink?.dataset.orderRef || "";
+      const status = document.getElementById("payment-status");
+
+      if (amount <= 0) return false;
+      if (!/^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+$/.test(pay.upiId)) {
+        status.textContent = "Please verify store UPI ID configuration.";
+        return false;
+      }
+
+      const link = buildUPILink(amount, orderRef);
+      status.textContent = "Opening your UPI app… Finish paying, then return here to send your screenshot on WhatsApp.";
+      window.location.href = link;
+      return false;
+    }
+
+    async function copyUPI() {
+      const pay = getActiveConfigPayment();
+      const status = document.getElementById("payment-status");
+      const copyBtn = document.getElementById("copy-upi-btn");
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(pay.upiId);
+        } else {
+          const ta = document.createElement("textarea");
+          ta.value = pay.upiId;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+        }
+        if (copyBtn) {
+          copyBtn.textContent = "✓ UPI ID Copied";
+          setTimeout(() => {
+            copyBtn.innerHTML = '<span aria-hidden="true">📋</span> Copy UPI ID';
+          }, 1800);
+        }
+        status.textContent = "UPI ID copied! Complete payment in your UPI app, then share your screenshot on WhatsApp.";
+      } catch {
+        status.textContent = "Copy this UPI ID manually: " + pay.upiId;
+      }
+    }
+
+    function continueOrder(mode) {
+      closePayment();
+      if (typeof orderWhatsApp === "function") {
+        const paymentMethod =
+          mode === "COD"
+            ? "Cash on Delivery (COD)"
+            : "UPI (Sharing payment screenshot)";
+        orderWhatsApp({ paymentMethod });
+      }
+    }
+
+    document.getElementById("payment-overlay").addEventListener("click", function (event) {
+      if (event.target === this) closePayment();
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") closePayment();
+    });
+  </script>
+</body>
+</html>
