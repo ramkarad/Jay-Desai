@@ -299,12 +299,16 @@ function updateCartCount() {
 }
 
 // =============================================
-// 5. UNIFIED CART SUCCESS TOAST
+// 5. UNIFIED CART SUCCESS TOAST (WITH COUNT)
 // =============================================
 
 let cartToastTimer;
 
-function showCartToast(productName) {
+function getCartItemCount() {
+  return getCart().reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+}
+
+function showCartToast(productName, productImage) {
   let popup = document.getElementById("cart-success-popup");
 
   if (!popup) {
@@ -314,18 +318,50 @@ function showCartToast(productName) {
     popup.setAttribute("role", "status");
     popup.setAttribute("aria-live", "polite");
     popup.innerHTML = `
-      <span class="popup-check" aria-hidden="true">✓</span>
-      <span class="popup-text" id="popup-message">Added to cart</span>
-      <a href="/cart.html" class="popup-view-cart">View Cart →</a>
-      <button type="button" class="popup-close" aria-label="Close notification" onclick="closeCartToast()">×</button>
+      <div class="popup-thumb">
+        <img id="popup-img" src="" alt="" referrerpolicy="no-referrer">
+        <span class="popup-check" aria-hidden="true">✓</span>
+      </div>
+      <div class="popup-body">
+        <div class="popup-title">Added to cart</div>
+        <div class="popup-text" id="popup-message"></div>
+        <div class="popup-count" id="popup-count"></div>
+      </div>
+      <div class="popup-actions">
+        <button type="button" class="popup-close" aria-label="Close notification" onclick="closeCartToast()">×</button>
+        <a href="/cart.html" class="popup-view-cart">
+          View Cart <span class="popup-badge" id="popup-badge">0</span>
+        </a>
+      </div>
     `;
     document.body.appendChild(popup);
   }
 
+  const count = getCartItemCount();
+  const shortName = String(productName || "Item").replace(/^Taitva\s+/i, "");
+
   const msg = popup.querySelector("#popup-message");
-  if (msg) {
-    const shortName = String(productName || "Item").replace(/^Taitva\s+/i, "");
-    msg.textContent = `Added ${shortName}`;
+  if (msg) msg.textContent = shortName;
+
+  const countEl = popup.querySelector("#popup-count");
+  if (countEl) {
+    countEl.innerHTML = `<strong>${count}</strong> ${count === 1 ? "item" : "items"} in your cart`;
+  }
+
+  const badge = popup.querySelector("#popup-badge");
+  if (badge) badge.textContent = String(count);
+
+  const img = popup.querySelector("#popup-img");
+  const thumb = popup.querySelector(".popup-thumb");
+  if (img && thumb) {
+    if (productImage) {
+      img.src = getImagePath(productImage);
+      img.alt = shortName;
+      img.style.display = "";
+      img.onerror = () => { img.style.display = "none"; };
+    } else {
+      img.style.display = "none";
+    }
   }
 
   clearTimeout(cartToastTimer);
@@ -333,9 +369,7 @@ function showCartToast(productName) {
   void popup.offsetWidth;
   popup.classList.add("active");
 
-  cartToastTimer = setTimeout(() => {
-    closeCartToast();
-  }, 2500);
+  cartToastTimer = setTimeout(closeCartToast, 3000);
 }
 
 function closeCartToast() {
@@ -633,7 +667,7 @@ async function addToCart(id, qtyToAdd = 1, triggerBtn = null) {
     }
 
     saveCart(cart);
-    showCartToast(product.name);
+    showCartToast(product.name, product.image);
 
     if (triggerBtn && triggerBtn.tagName === "BUTTON") {
       const originalText = triggerBtn.dataset.origLabel || triggerBtn.textContent.trim();
