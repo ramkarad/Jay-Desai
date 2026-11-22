@@ -45,13 +45,15 @@
         <div>
           <span class="eyebrow">Store Management</span>
           <h1>Taitva Store Dashboard</h1>
-          <p style="color:var(--text-muted);font-size:14px;">Edit products, pricing, settings, and download an updated store-config.js for GitHub.</p>
+          <p style="color:var(--text-muted);font-size:14px;">Edit products, pricing, settings, then copy or download an updated store-config.js for GitHub.</p>
         </div>
         <div class="admin-toolbar">
-          <button type="button" class="btn" onclick="exportStoreConfigFile()">Download store-config.js</button>
+          <button type="button" class="btn" id="copy-config-btn" onclick="copyStoreConfigFile()">Copy store-config.js</button>
+          <button type="button" class="btn-secondary" onclick="exportStoreConfigFile()">Download store-config.js</button>
           <button type="button" class="logout-btn" onclick="adminLogout()">Logout</button>
         </div>
       </div>
+      <p id="config-copy-status" class="form-status" aria-live="polite" style="margin-top:-12px;margin-bottom:16px;"></p>
 
       <!-- PRODUCT FORM -->
       <div class="admin-card">
