@@ -1,7 +1,7 @@
 /* ============================================================================
    TAITVA PURE BY NATURE — ADMIN DASHBOARD SCRIPT (Pure Client-Side JS)
    SHA-256 Passcode Auth + Product CRUD + Settings Overrides +
-   Customer Review Moderation + One-Click store-config.js Export
+   Customer Review Moderation + Copy / Download store-config.js
    ============================================================================ */
 
 const ADMIN_PASSCODE_HASH_KEY = "taitva_admin_passcode_hash_v1";
@@ -451,15 +451,15 @@ function saveStoreSettings(event) {
   saveOverrides(overrides);
   const status = document.getElementById("settings-status");
   if (status) {
-    status.textContent = "Store settings saved for this browser. Use 'Download store-config.js' to update GitHub.";
+    status.textContent = "Store settings saved for this browser. Use 'Copy store-config.js' to update GitHub.";
   }
 }
 
 // =============================================
-// EXPORT UPDATED store-config.js FOR GITHUB
+// COPY / DOWNLOAD store-config.js FOR GITHUB
 // =============================================
 
-async function exportStoreConfigFile() {
+async function buildStoreConfigFileContent() {
   const products = await getProducts();
   const cfg = getConfig();
   const exportPayload = {
@@ -467,8 +467,7 @@ async function exportStoreConfigFile() {
     products
   };
 
-  const fileContent =
-`/* TAITVA PURE BY NATURE — EXPORTED STORE CONFIGURATION */
+  return `/* TAITVA PURE BY NATURE — EXPORTED STORE CONFIGURATION */
 (function (global) {
   "use strict";
   const BASE_CONFIG = ${JSON.stringify(exportPayload, null, 2)};
@@ -476,7 +475,73 @@ async function exportStoreConfigFile() {
   global.TAITVA_CONFIG = BASE_CONFIG;
 })(typeof window !== "undefined" ? window : globalThis);
 `;
+}
 
+function setConfigCopyStatus(msg, type = "success") {
+  const el = document.getElementById("config-copy-status");
+  if (!el) return;
+  el.textContent = msg;
+  el.className = msg ? `form-status ${type}` : "form-status";
+}
+
+function fallbackCopyText(text) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly", "");
+  ta.style.position = "fixed";
+  ta.style.top = "-9999px";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  ta.setSelectionRange(0, ta.value.length);
+  let ok = false;
+  try {
+    ok = document.execCommand("copy");
+  } catch {
+    ok = false;
+  }
+  document.body.removeChild(ta);
+  return ok;
+}
+
+let copyBtnTimer = null;
+
+async function copyStoreConfigFile() {
+  const btn = document.getElementById("copy-config-btn");
+  const originalLabel = "Copy store-config.js";
+
+  try {
+    const content = await buildStoreConfigFileContent();
+    let copied = false;
+
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(content);
+        copied = true;
+      } catch {
+        copied = false;
+      }
+    }
+    if (!copied) copied = fallbackCopyText(content);
+
+    if (copied) {
+      if (btn) {
+        btn.textContent = "✓ Copied!";
+        clearTimeout(copyBtnTimer);
+        copyBtnTimer = setTimeout(() => { btn.textContent = originalLabel; }, 2000);
+      }
+      setConfigCopyStatus("store-config.js copied. Paste it into GitHub and commit.", "success");
+    } else {
+      setConfigCopyStatus("Copy blocked by the browser. Use 'Download store-config.js' instead.", "error");
+    }
+  } catch (error) {
+    console.error("Copy store-config error:", error);
+    setConfigCopyStatus("Could not copy. Use 'Download store-config.js' instead.", "error");
+  }
+}
+
+async function exportStoreConfigFile() {
+  const fileContent = await buildStoreConfigFileContent();
   const blob = new Blob([fileContent], { type: "application/javascript" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -486,6 +551,7 @@ async function exportStoreConfigFile() {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+  setConfigCopyStatus("store-config.js downloaded.", "success");
 }
 
 // =============================================
